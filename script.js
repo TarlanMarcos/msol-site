@@ -149,47 +149,57 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // ===== FORMULÁRIO DE CONTATO =====
-  const contactForm = document.querySelector('.contato-form form');
+  const contactForm = document.getElementById('contact-form');
   
   if (contactForm) {
-    contactForm.addEventListener('submit', function(e) {
+    contactForm.addEventListener('submit', async function(e) {
       e.preventDefault();
       
-      // Validação básica
-      const requiredFields = contactForm.querySelectorAll('[required]');
-      let isValid = true;
+      const submitButton = contactForm.querySelector('button[type="submit"]');
+      const originalText = submitButton.innerHTML;
       
-      requiredFields.forEach(field => {
-        if (!field.value.trim()) {
-          isValid = false;
-          field.style.borderColor = '#ef4444';
-          
-          // Remove a cor vermelha após 3 segundos
-          setTimeout(() => {
-            field.style.borderColor = '';
-          }, 3000);
-        }
-      });
+      // Desabilita o botão e mostra loading
+      submitButton.disabled = true;
+      submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
       
-      if (isValid) {
-        // Mostra loading no botão
-        const submitBtn = contactForm.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
-        submitBtn.disabled = true;
+      try {
+        // Coleta os dados do formulário
+        const formData = new FormData(contactForm);
+        const data = {
+          name: formData.get('name'),
+          email: formData.get('email'),
+          phone: formData.get('phone'),
+          service: formData.get('service'),
+          message: formData.get('message')
+        };
         
-        // Simula envio (substitua pela integração real)
-        setTimeout(() => {
-          // Aqui você pode integrar com um serviço real como Formspree, EmailJS, etc.
-          alert('Mensagem enviada com sucesso! Entraremos em contato em breve.');
+        // Envia para a API
+        const response = await fetch('/api/form-submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+          // Sucesso
+          showNotification('Formulário enviado com sucesso! Entraremos em contato em breve.', 'success');
           contactForm.reset();
-          
-          // Restaura o botão
-          submitBtn.innerHTML = originalText;
-          submitBtn.disabled = false;
-        }, 2000);
-      } else {
-        alert('Por favor, preencha todos os campos obrigatórios.');
+        } else {
+          // Erro
+          showNotification(result.error || 'Erro ao enviar formulário. Tente novamente.', 'error');
+        }
+        
+      } catch (error) {
+        console.error('Erro:', error);
+        showNotification('Erro de conexão. Verifique sua internet e tente novamente.', 'error');
+      } finally {
+        // Restaura o botão
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalText;
       }
     });
     
