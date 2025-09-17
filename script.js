@@ -1,3 +1,51 @@
+// ===== FORMULÁRIO DE CONTATO =====
+const contactForm = document.getElementById('contact-form');
+
+if (contactForm) {
+  contactForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const submitButton = contactForm.querySelector('button[type="submit"]');
+    const originalText = submitButton.innerHTML;
+
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
+    try {
+      const formData = new FormData(contactForm);
+      const data = {
+        name: formData.get('name'),
+        email: formData.get('email'),
+        phone: formData.get('phone'),
+        service: formData.get('service'),
+        message: formData.get('message')
+      };
+
+      // 🔹 Aqui vai a URL do webhook Pipedream (você cria no próximo passo)
+      const webhookUrl = "https://xxxxxxxx.m.pipedream.net";
+
+      const response = await fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      if (response.ok) {
+        showNotification("Formulário enviado com sucesso!", "success");
+        contactForm.reset();
+      } else {
+        showNotification("Erro ao enviar formulário.", "error");
+      }
+
+    } catch (error) {
+      console.error("Erro:", error);
+      showNotification("Erro de conexão. Verifique sua internet.", "error");
+    } finally {
+      submitButton.disabled = false;
+      submitButton.innerHTML = originalText;
+    }
+  });
+}
 // Aguarda o carregamento completo do DOM
 document.addEventListener('DOMContentLoaded', function() {
   
@@ -148,69 +196,55 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // ===== FORMULÁRIO DE CONTATO =====
-  const contactForm = document.getElementById('contact-form');
-  
-  if (contactForm) {
-    contactForm.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      
-      const submitButton = contactForm.querySelector('button[type="submit"]');
-      const originalText = submitButton.innerHTML;
-      
-      // Desabilita o botão e mostra loading
-      submitButton.disabled = true;
-      submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
-      
-      try {
-        // Coleta os dados do formulário
-        const formData = new FormData(contactForm);
-        const data = {
-          name: formData.get('name'),
-          email: formData.get('email'),
-          phone: formData.get('phone'),
-          service: formData.get('service'),
-          message: formData.get('message')
-        };
-        
-        // Envia para a API
-        const response = await fetch('/api/form-submit', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data)
-        });
-        
-        const result = await response.json();
-        
-        if (response.ok) {
-          // Sucesso
-          showNotification('Formulário enviado com sucesso! Entraremos em contato em breve.', 'success');
-          contactForm.reset();
-        } else {
-          // Erro
-          showNotification(result.error || 'Erro ao enviar formulário. Tente novamente.', 'error');
-        }
-        
-      } catch (error) {
-        console.error('Erro:', error);
-        showNotification('Erro de conexão. Verifique sua internet e tente novamente.', 'error');
-      } finally {
-        // Restaura o botão
-        submitButton.disabled = false;
-        submitButton.innerHTML = originalText;
-      }
-    });
-    
-    // Remove bordas vermelhas ao digitar
-    const formInputs = contactForm.querySelectorAll('input, textarea, select');
-    formInputs.forEach(input => {
-      input.addEventListener('input', function() {
-        this.style.borderColor = '';
+// ===== FORMULÁRIO DE CONTATO =====
+const contactForm = document.getElementById('contact-form');
+
+if (contactForm) {
+  contactForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const submitButton = contactForm.querySelector('button[type="submit"]');
+    const originalText = submitButton.innerHTML;
+
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
+    try {
+      const formData = new FormData(contactForm);
+      const data = {
+        name: formData.get('name'),
+        email: formData.get('email'),
+        phone: formData.get('phone'),
+        service: formData.get('service'),
+        message: formData.get('message')
+      };
+
+      // 🔹 Aqui vai a URL do webhook Pipedream (você cria no próximo passo)
+      const webhookUrl = "https://xxxxxxxx.m.pipedream.net";
+
+      const response = await fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
       });
-    });
-  }
+
+      if (response.ok) {
+        showNotification("Formulário enviado com sucesso!", "success");
+        contactForm.reset();
+      } else {
+        showNotification("Erro ao enviar formulário.", "error");
+      }
+
+    } catch (error) {
+      console.error("Erro:", error);
+      showNotification("Erro de conexão. Verifique sua internet.", "error");
+    } finally {
+      submitButton.disabled = false;
+      submitButton.innerHTML = originalText;
+    }
+  });
+}
+
 
   // ===== CONTADOR ANIMADO =====
   const stats = document.querySelectorAll('.stat-number');
