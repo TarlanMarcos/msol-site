@@ -15,6 +15,10 @@ body {
   color: #1a1a1a;
   background: #ffffff;
   overflow-x: hidden;
+
+  /* >>> Correção para header fixo não cortar conteúdo <<< */
+  /* Valor inicial — o JS irá ajustar dinamicamente ao carregar/resize */
+  padding-top: 80px;
 }
 
 .container {
@@ -1063,3 +1067,9 @@ a:focus {
   }
 }
 
+/* Ajuste fino para telas pequenas (fallback CSS) */
+@media (max-width: 768px) {
+  body {
+    padding-top: 70px;
+  }
+}
