@@ -1,6 +1,5 @@
-// Função para exibir notificações (já usada no seu código original)
+// Função para exibir notificações
 function showNotification(message, type) {
-  // Cria ou reutiliza um elemento de notificação
   let notification = document.getElementById('custom-notification');
   if (!notification) {
     notification = document.createElement('div');
@@ -21,23 +20,20 @@ function showNotification(message, type) {
     document.body.appendChild(notification);
   }
 
-  // Define cor com base no tipo
   notification.style.backgroundColor = type === 'success' ? '#10b981' : '#ef4444';
   notification.textContent = message;
 
-  // Mostra com animação
   setTimeout(() => {
     notification.style.transform = 'translateX(0)';
   }, 10);
 
-  // Remove após 3 segundos
   setTimeout(() => {
     notification.style.transform = 'translateX(120%)';
     setTimeout(() => notification.remove(), 300);
   }, 3000);
 }
 
-// ===== FORMULÁRIO DE CONTATO =====
+// ===== FORMULÁRIO DE CONTATO → WHATSAPP =====
 const contactForm = document.getElementById('contact-form');
 if (contactForm) {
   contactForm.addEventListener('submit', function(e) {
@@ -54,7 +50,6 @@ if (contactForm) {
     const service = formData.get('service') || '';
     const message = formData.get('message') || '';
 
-    // Mapear serviço para texto legível
     const serviceText = {
       'rural': 'Rural',
       'residencial': 'Residencial Urbano',
@@ -62,7 +57,6 @@ if (contactForm) {
       'industrial': 'Industrial'
     }[service] || service;
 
-    // Montar mensagem formatada
     let msg = `Olá! Recebi uma nova solicitação de orçamento pelo site:\n\n`;
     msg += `*Nome:* ${name}\n`;
     if (email) msg += `*E-mail:* ${email}\n`;
@@ -70,19 +64,15 @@ if (contactForm) {
     if (service) msg += `*Tipo de projeto:* ${serviceText}\n`;
     if (message) msg += `*Mensagem:* ${message}\n`;
 
-    // Número do WhatsApp: (46) 92000-3297 → 5546920003297
-    const whatsappNumber = '5546920003297';
+    const whatsappNumber = '5546920003297'; // (46) 92000-3297
     const encodedMsg = encodeURIComponent(msg);
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMsg}`;
 
-    // Abre o WhatsApp em nova aba
     window.open(whatsappUrl, '_blank');
 
-    // Notificação e reset
     showNotification("Redirecionando para o WhatsApp...", "success");
     contactForm.reset();
 
-    // Restaura botão
     setTimeout(() => {
       submitButton.disabled = false;
       submitButton.innerHTML = originalText;
@@ -90,8 +80,20 @@ if (contactForm) {
   });
 }
 
-// Aguarda o carregamento completo do DOM
+// ===== AJUSTE DINÂMICO DO PADDING-TOP PARA HEADER FIXO =====
+function updateBodyPadding() {
+  const header = document.querySelector('header');
+  if (header) {
+    const headerHeight = header.offsetHeight;
+    document.body.style.paddingTop = `${headerHeight}px`;
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+  updateBodyPadding();
+  window.addEventListener('resize', updateBodyPadding);
+  window.addEventListener('scroll', updateBodyPadding); // atualiza ao rolar (caso o header mude de altura)
+
   // ===== NAVEGAÇÃO SUAVE =====
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
@@ -110,15 +112,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // ===== HEADER SCROLL EFFECT =====
   const header = document.querySelector('header');
-  let lastScrollTop = 0;
   window.addEventListener('scroll', function() {
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    if (scrollTop > 100) {
+    if (window.pageYOffset > 100) {
       header.classList.add('scrolled');
     } else {
       header.classList.remove('scrolled');
     }
-    lastScrollTop = scrollTop;
   });
 
   // ===== MENU MOBILE =====
@@ -174,36 +173,27 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
     backToTopBtn.addEventListener('click', function() {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
 
   // ===== ANIMAÇÕES DE SCROLL =====
-  const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-  };
-  const observer = new IntersectionObserver(function(entries) {
+  const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('fade-in-up');
       }
     });
-  }, observerOptions);
+  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
-  const animatedElements = document.querySelectorAll('.servico, .projeto, .depoimento, .feature');
-  animatedElements.forEach(el => observer.observe(el));
+  document.querySelectorAll('.servico, .projeto, .depoimento, .feature').forEach(el => observer.observe(el));
 
   // ===== NAVEGAÇÃO ATIVA =====
-  const sections = document.querySelectorAll('section[id]');
   const navLinks = document.querySelectorAll('nav ul li a[href^="#"]');
   window.addEventListener('scroll', function() {
     let current = '';
     const scrollPosition = window.pageYOffset + 200;
-    sections.forEach(section => {
+    document.querySelectorAll('section[id]').forEach(section => {
       const sectionTop = section.offsetTop;
       const sectionHeight = section.clientHeight;
       if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
@@ -221,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // ===== CONTADOR ANIMADO =====
   const stats = document.querySelectorAll('.stat-number');
   let statsAnimated = false;
-  const statsObserver = new IntersectionObserver(function(entries) {
+  const statsObserver = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (entry.isIntersecting && !statsAnimated) {
         statsAnimated = true;
@@ -229,7 +219,6 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }, { threshold: 0.5 });
-
   if (stats.length > 0) {
     statsObserver.observe(stats[0].closest('.hero-stats'));
   }
@@ -253,15 +242,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // ===== LAZY LOADING PARA IMAGENS =====
   const images = document.querySelectorAll('img[src]');
-  const imageObserver = new IntersectionObserver(function(entries) {
+  const imageObserver = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         const img = entry.target;
         img.style.opacity = '1';
         img.style.transition = 'opacity 0.3s ease';
-        img.onload = function() {
-          img.style.opacity = '1';
-        };
         imageObserver.unobserve(img);
       }
     });
@@ -279,8 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // ===== TOOLTIP PARA BOTÕES =====
-  const tooltipElements = document.querySelectorAll('[data-tooltip]');
-  tooltipElements.forEach(element => {
+  document.querySelectorAll('[data-tooltip]').forEach(element => {
     element.addEventListener('mouseenter', function() {
       const tooltip = document.createElement('div');
       tooltip.className = 'tooltip';
@@ -303,32 +288,19 @@ document.addEventListener('DOMContentLoaded', function() {
       tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2) + 'px';
       tooltip.style.top = rect.top - tooltip.offsetHeight - 10 + 'px';
       setTimeout(() => tooltip.style.opacity = '1', 10);
-      this.addEventListener('mouseleave', function() {
-        tooltip.remove();
-      }, { once: true });
+      this.addEventListener('mouseleave', () => tooltip.remove(), { once: true });
     });
   });
 
-  // ===== PERFORMANCE: DEBOUNCE PARA SCROLL =====
-  function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-      const later = () => {
-        clearTimeout(timeout);
-        func(...args);
-      };
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
-    };
-  }
-  const debouncedScrollHandler = debounce(function() {}, 16);
-  window.addEventListener('scroll', debouncedScrollHandler);
-
-  // ===== ACESSIBILIDADE: NAVEGAÇÃO POR TECLADO =====
+  // ===== ACESSIBILIDADE =====
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape' && menu && menu.classList.contains('active')) {
       menu.classList.remove('active');
       menuToggle.classList.remove('active');
+      const spans = menuToggle.querySelectorAll('span');
+      spans[0].style.transform = 'none';
+      spans[1].style.opacity = '1';
+      spans[2].style.transform = 'none';
     }
   });
 });
